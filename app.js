@@ -1,4 +1,6 @@
 const express = require('express')
+const flash = require('connect-flash')
+const session = require('express-session')
 const app = express()
 
 const { engine } = require('express-handlebars')
@@ -16,6 +18,13 @@ app.set('views', './views')
 app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
 
+app.use(session({
+  secret: 'ThisIsSecret',
+  resave: false,
+  saveUninitialized: false
+}))
+app.use(flash())
+
 app.get('/', (req, res) => {
   res.render('index')
 })
@@ -25,7 +34,7 @@ app.get('/todos', (req, res) => {
     attributes: ['id', 'name', 'isComplete'],
     raw: true
   })
-    .then((todos) => res.render('todos', { todos }))
+    .then((todos) => res.render('todos', { todos, message: req.flash('success') }))
     .catch((err) => res.status(422).json(err))
 })
 
@@ -36,7 +45,11 @@ app.get('/todos/new', (req, res) => {
 app.post('/todos', (req, res) => {
   const name = req.body.name
   return Todo.create({ name })
-    .then(() => res.redirect('/todos'))
+    .then(() => {
+      req.flash('success', '新增成功!')
+      return res.redirect('/todos')
+    }
+    )
 })
 
 app.get('/todos/:id', (req, res) => {
