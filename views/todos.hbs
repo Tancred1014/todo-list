@@ -2,9 +2,8 @@
 <div>{{error}}</div>
 {{/if}}
 
-{{#if message}}
-<div>{{message}}</div>
-{{/if}}
+{{> message}}
+
 <a href="/todos/new">Create</a>
 <ul>
   {{#each todos}}
@@ -13,7 +12,7 @@
     {{this.name}}
     <a href="/todos/{{this.id}}">detail</a>
     <a href="/todos/{{this.id}}/edit">edit</a>
-    <form action="/todos/{{this.id}}?_method=DELETE" method="POST" style="display: inline;">
+    <form action="/todos/{{this.id}}?_method=DELETE" method="post" style="display:inline;">
       <button type="submit">delete</button>
     </form>
   </li>
