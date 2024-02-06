@@ -3,6 +3,11 @@ const flash = require('connect-flash')
 const session = require('express-session')
 const app = express()
 
+if (process.env.NODE_ENV === 'development') {
+  require('dotenv').config()
+}
+// console.log(process.env.SESSION_SECRET)
+
 const { engine } = require('express-handlebars')
 const methodOverride = require('method-override')
 
@@ -11,8 +16,9 @@ const router = require('./routes')
 const messageHandler = require('./middlewares/message-handler')
 const errorHandler = require('./middlewares/error-handler')
 
-
 const port = 3000
+
+console.log('env', process.env.NODE_ENV)
 
 app.engine('.hbs', engine({ extname: '.hbs' }))
 app.set('view engine', '.hbs')
@@ -22,7 +28,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
 
 app.use(session({
-  secret: 'ThisIsSecret',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false
 }))
