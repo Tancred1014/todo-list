@@ -5,11 +5,18 @@ const db = require('../models')
 const Todo = db.Todo
 
 router.get('/', (req, res, next) => {
+  const page = parseInt(req.query.page) || 1
+  const limit = 10
+
   return Todo.findAll({
     attributes: ['id', 'name', 'isComplete'],
     raw: true
   })
-    .then((todos) => res.render('todos', { todos, error: req.flash('error') }))
+    .then((todos) => res.render('todos', {
+      todos: todos.slice((page - 1) * limit, page * limit),
+      prev: page > 1 ? page - 1 : page,
+      next: page + 1,
+    }))
     .catch((error) => {
       error.errorMessage = '資料取得失敗:('
       next(error)
