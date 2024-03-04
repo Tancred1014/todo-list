@@ -20,9 +20,10 @@ passport.use(new LocalStrategy({ usernameField: 'email' }, (username, password, 
       }
       return done(null, user)
     })
-    .catch((error) =>
-      error.errorMessage = '登入失敗',
-      done(error))
+    .catch((error) => {
+      error.errorMessage = '登入失敗'
+      return done(error)
+    })
 }))
 
 passport.serializeUser((user, done) => {
@@ -30,11 +31,16 @@ passport.serializeUser((user, done) => {
   return done(null, { id, name, email })
 })
 
+passport.deserializeUser((user, done) => {
+  done(null, { id: user.id })
+})
+
 // 準備引入路由模組
 const todos = require('./todos')
 const users = require('./users')
+const authHander = require('../middlewares/auth-hander')
 
-router.use('/todos', todos)
+router.use('/todos', authHander, todos)
 router.use('/users', users)
 
 router.get('/', (req, res) => {
@@ -55,8 +61,13 @@ router.post('/login', passport.authenticate('local', {
   failureFlash: true
 }))
 
-router.post('logout', (req, res) => {
-  return res.render('logout')
+router.post('/logout', (req, res) => {
+  req.logout((error) => {
+    if (error) {
+      next(error)
+    }
+    return res.redirect('/login')
+  })
 })
 // 匯出路由器
 module.exports = router
