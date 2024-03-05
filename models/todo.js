@@ -1,6 +1,6 @@
 'use strict';
 const {
-  Model
+  Model, INTEGER
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Todo extends Model {
@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      Todo.belongsTo(models.User)
     }
   }
   Todo.init({
@@ -18,6 +18,10 @@ module.exports = (sequelize, DataTypes) => {
     isComplete: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
+      allowNull: false
+    },
+    userId: {
+      type: DataTypes.INTEGER,
       allowNull: false
     }
   }, {
